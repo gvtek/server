@@ -1985,6 +1985,11 @@ int write_bin_log(THD *thd, bool clear_error,
                   char const *query, ulong query_length, bool is_trans)
 {
   int error= 0;
+  TABLE_LIST *first_table= thd->lex->select_lex.table_list.first;
+  if (!(thd->is_current_stmt_binlog_format_row() &&
+        first_table->table &&
+        first_table->table->s->tmp_table != NO_TMP_TABLE ))
+    return 0;
   if (mysql_bin_log.is_open())
   {
     int errcode= 0;
